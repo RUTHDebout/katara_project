@@ -1,0 +1,42 @@
+services:
+  # API principale
+  - type: web
+    name: katara-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn katara_api:app --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    healthCheckPath: /api/status
+    envVars:
+      - key: OWM_API_KEY
+        sync: false
+      - key: AT_USERNAME
+        sync: false
+      - key: AT_API_KEY
+        sync: false
+      - key: AT_SENDER
+        value: KATARA
+      - key: GEE_PROJECT
+        value: katara-flood-prediction
+      - key: KATARA_DB
+        value: /var/data/katara.db
+
+  # Scheduler (worker en arrière-plan)
+  - type: worker
+    name: katara-scheduler
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python katara_scheduler.py
+    envVars:
+      - key: OWM_API_KEY
+        sync: false
+      - key: AT_USERNAME
+        sync: false
+      - key: AT_API_KEY
+        sync: false
+      - key: KATARA_DB
+        value: /var/data/katara.db
+
+disks:
+  - name: katara-data
+    mountPath: /var/data
+    sizeGB: 1

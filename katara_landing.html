@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KATARA — Prédiction d'Inondations par IA · Afrique de l'Ouest</title>
+  <meta name="description" content="KATARA est une plateforme IA de prédiction et d'alerte précoce pour les inondations en Afrique de l'Ouest. Surveillance en temps réel, alertes SMS, modèle ML à 89% de précision."/>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bleu:       #0A1628;
+      --bleu-med:   #1A3A5C;
+      --bleu-clr:   #2E6DA4;
+      --bleu-light: #4A90D9;
+      --or:         #E8A020;
+      --or-light:   #F5C842;
+      --vert:       #00C48C;
+      --rouge:      #FF4757;
+      --gris:       #8898AA;
+      --gris-light: #F0F4F8;
+      --blanc:      #FFFFFF;
+      --text-dark:  #0D1B2A;
+      --gradient-hero: linear-gradient(135deg, #0A1628 0%, #0D2340 40%, #0A2E55 70%, #07213E 100%);
+      --gradient-or: linear-gradient(90deg, #E8A020, #F5C842);
+      --gradient-blue: linear-gradient(135deg, #2E6DA4, #4A90D9);
+      --font-main: 'Inter', sans-serif;
+      --font-head: 'Space Grotesk', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: var(--font-main); background: var(--blanc); color: var(--text-dark); overflow-x: hidden; }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 1000;
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 72px;
+      background: rgba(10,22,40,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      transition: all .3s;
+    }
+    .nav-logo {
+      font-family: var(--font-head); font-size: 1.5rem; font-weight: 700;
+      color: var(--blanc); display: flex; align-items: center; gap: 10px;
+      text-decoration: none;
+    }
+    .nav-logo span { color: var(--or); }
+    .nav-logo .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--vert); display: inline-block; animation: pulse-dot 2s infinite; }
+    @keyframes pulse-dot { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.4)} }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a { color: rgba(255,255,255,.75); text-decoration: none; font-size: .9rem; font-weight: 500; transition: color .2s; }
+    .nav-links a:hover { color: var(--or); }
+    .nav-cta {
+      background: var(--gradient-or); color: var(--bleu); font-weight: 700;
+      padding: .6rem 1.4rem; border-radius: 50px; font-size: .9rem;
+      text-decoration: none; transition: transform .2s, box-shadow .2s;
+      white-space: nowrap;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(232,160,32,.4); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh; display: flex; align-items: center;
+      background: var(--gradient-hero); position: relative; overflow: hidden;
+      padding: 100px 5% 80px;
+    }
+    .hero-bg-circles { position: absolute; inset: 0; pointer-events: none; }
+    .circle {
+      position: absolute; border-radius: 50%;
+      border: 1px solid rgba(255,255,255,.04);
+    }
+    .c1 { width: 700px; height: 700px; top: -200px; right: -200px; }
+    .c2 { width: 500px; height: 500px; top: 100px; right: 50px; border-color: rgba(232,160,32,.08); }
+    .c3 { width: 300px; height: 300px; bottom: 100px; left: -100px; border-color: rgba(74,144,217,.12); }
+
+    /* Wave animation at bottom of hero */
+    .hero-wave { position: absolute; bottom: 0; left: 0; width: 100%; overflow: hidden; line-height: 0; }
+    .hero-wave svg { display: block; }
+
+    .hero-content { position: relative; z-index: 2; max-width: 700px; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(232,160,32,.12); border: 1px solid rgba(232,160,32,.3);
+      color: var(--or); padding: .4rem 1rem; border-radius: 50px; font-size: .8rem; font-weight: 600;
+      margin-bottom: 1.5rem; letter-spacing: .05em;
+    }
+    .hero-badge .live { width: 8px; height: 8px; border-radius: 50%; background: var(--or); animation: pulse-dot 1.5s infinite; }
+    .hero-title {
+      font-family: var(--font-head); font-size: clamp(2.8rem, 6vw, 5rem);
+      font-weight: 700; color: var(--blanc); line-height: 1.1; margin-bottom: 1.5rem;
+    }
+    .hero-title .accent { color: var(--or); }
+    .hero-title .accent-blue { color: var(--bleu-light); }
+    .hero-sub {
+      font-size: 1.1rem; color: rgba(255,255,255,.7); line-height: 1.8;
+      margin-bottom: 2.5rem; max-width: 560px;
+    }
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--gradient-or); color: var(--bleu); font-weight: 700;
+      padding: .85rem 2rem; border-radius: 50px; font-size: 1rem;
+      text-decoration: none; transition: transform .2s, box-shadow .2s; display: inline-flex; align-items: center; gap: 8px;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(232,160,32,.45); }
+    .btn-secondary {
+      border: 1.5px solid rgba(255,255,255,.3); color: var(--blanc); font-weight: 600;
+      padding: .85rem 2rem; border-radius: 50px; font-size: 1rem;
+      text-decoration: none; transition: all .2s; display: inline-flex; align-items: center; gap: 8px;
+      backdrop-filter: blur(8px);
+    }
+    .btn-secondary:hover { border-color: var(--or); color: var(--or); }
+
+    .hero-stats { display: flex; gap: 3rem; margin-top: 3.5rem; flex-wrap: wrap; }
+    .hstat-val { font-family: var(--font-head); font-size: 2rem; font-weight: 700; color: var(--or); }
+    .hstat-lbl { font-size: .8rem; color: rgba(255,255,255,.5); margin-top: 2px; font-weight: 500; }
+
+    /* Animated map on the right */
+    .hero-visual { position: absolute; right: 5%; top: 50%; transform: translateY(-50%); width: 42%; max-width: 560px; z-index: 2; }
+    .map-card {
+      background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.1);
+      border-radius: 20px; padding: 1.5rem; backdrop-filter: blur(20px);
+      box-shadow: 0 40px 80px rgba(0,0,0,.4);
+    }
+    .map-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .map-card-title { font-size: .85rem; font-weight: 600; color: rgba(255,255,255,.8); }
+    .map-live { font-size: .75rem; color: var(--vert); display: flex; align-items: center; gap: 5px; font-weight: 500; }
+    .map-live::before { content:''; width:6px;height:6px;border-radius:50%;background:var(--vert);animation:pulse-dot 1.5s infinite; }
+    .zone-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .6rem .8rem; border-radius: 10px; margin-bottom: .4rem;
+      background: rgba(255,255,255,.04); transition: background .2s;
+      animation: slide-in .6s ease forwards; opacity: 0;
+    }
+    .zone-row:nth-child(1){animation-delay:.1s} .zone-row:nth-child(2){animation-delay:.25s}
+    .zone-row:nth-child(3){animation-delay:.4s} .zone-row:nth-child(4){animation-delay:.55s}
+    .zone-row:nth-child(5){animation-delay:.7s}
+    @keyframes slide-in { from{opacity:0;transform:translateX(20px)} to{opacity:1;transform:translateX(0)} }
+    .zone-name { font-size: .8rem; color: rgba(255,255,255,.85); font-weight: 500; }
+    .zone-prob-bar { flex: 1; margin: 0 1rem; height: 5px; border-radius: 3px; background: rgba(255,255,255,.1); position: relative; overflow: hidden; }
+    .zone-prob-fill { height: 100%; border-radius: 3px; position: absolute; top: 0; left: 0; transition: width 1.5s ease; }
+    .prob-crit { background: linear-gradient(90deg, #FF4757, #FF6B81); }
+    .prob-moyen { background: linear-gradient(90deg, #FFA502, #FFD32A); }
+    .prob-faible { background: linear-gradient(90deg, #2ED573, #7BED9F); }
+    .prob-normal { background: linear-gradient(90deg, #2E6DA4, #4A90D9); }
+    .zone-badge { font-size: .65rem; font-weight: 700; padding: 3px 8px; border-radius: 20px; white-space: nowrap; }
+    .badge-crit { background: rgba(255,71,87,.2); color: #FF4757; border: 1px solid rgba(255,71,87,.3); }
+    .badge-moyen { background: rgba(255,165,2,.2); color: #FFA502; border: 1px solid rgba(255,165,2,.3); }
+    .badge-faible { background: rgba(46,213,115,.2); color: #2ED573; border: 1px solid rgba(46,213,115,.3); }
+    .badge-normal { background: rgba(46,109,164,.2); color: var(--bleu-light); border: 1px solid rgba(46,109,164,.3); }
+
+    /* ── SECTIONS COMMONS ── */
+    section { padding: 100px 5%; }
+    .section-label {
+      text-transform: uppercase; letter-spacing: .12em; font-size: .75rem; font-weight: 700;
+      color: var(--bleu-clr); margin-bottom: .8rem;
+    }
+    .section-title {
+      font-family: var(--font-head); font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700; line-height: 1.2; color: var(--text-dark); margin-bottom: 1.2rem;
+    }
+    .section-title .accent { color: var(--bleu-clr); }
+    .section-sub { font-size: 1rem; color: var(--gris); line-height: 1.8; max-width: 560px; }
+    .text-center { text-align: center; }
+    .text-center .section-sub { margin: 0 auto; }
+
+    /* ── PROBLÈME / SOLUTION ── */
+    #problem { background: var(--gris-light); }
+    .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: center; margin-top: 4rem; }
+    .problem-card {
+      background: var(--blanc); border-radius: 20px; padding: 2.5rem;
+      border-left: 4px solid var(--rouge); box-shadow: 0 4px 32px rgba(0,0,0,.06);
+    }
+    .solution-card {
+      background: var(--bleu-med); border-radius: 20px; padding: 2.5rem;
+      border-left: 4px solid var(--vert); box-shadow: 0 4px 32px rgba(10,22,40,.25);
+    }
+    .ps-icon { font-size: 2.5rem; margin-bottom: 1rem; }
+    .ps-head { font-family: var(--font-head); font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; }
+    .problem-card .ps-head { color: var(--rouge); }
+    .solution-card .ps-head { color: var(--vert); }
+    .ps-list { list-style: none; display: flex; flex-direction: column; gap: .75rem; }
+    .ps-list li { display: flex; align-items: flex-start; gap: .75rem; font-size: .95rem; line-height: 1.6; }
+    .problem-card .ps-list li { color: var(--text-dark); }
+    .solution-card .ps-list li { color: rgba(255,255,255,.85); }
+    .ps-list li::before { content: attr(data-icon); flex-shrink: 0; margin-top: 2px; }
+
+    /* ── STATS IMPACT ── */
+    #impact { background: var(--bleu); }
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 2rem; margin-top: 3rem; }
+    .stat-card {
+      text-align: center; padding: 2rem 1rem;
+      border: 1px solid rgba(255,255,255,.08); border-radius: 16px;
+      background: rgba(255,255,255,.04); backdrop-filter: blur(8px);
+      transition: transform .3s, border-color .3s;
+    }
+    .stat-card:hover { transform: translateY(-6px); border-color: rgba(232,160,32,.3); }
+    .stat-num { font-family: var(--font-head); font-size: 3rem; font-weight: 700; color: var(--or); line-height: 1; }
+    .stat-unit { font-size: 1.5rem; }
+    .stat-label { color: rgba(255,255,255,.6); font-size: .85rem; margin-top: .6rem; font-weight: 500; }
+    .stat-sub { color: rgba(255,255,255,.35); font-size: .75rem; margin-top: .3rem; }
+    #impact .section-title { color: var(--blanc); }
+    #impact .section-sub { color: rgba(255,255,255,.6); }
+
+    /* ── COMMENT ÇA MARCHE ── */
+    #how { background: var(--blanc); }
+    .steps-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2.5rem; margin-top: 3.5rem; }
+    .step-card {
+      padding: 2rem; border-radius: 20px; border: 1.5px solid var(--gris-light);
+      position: relative; transition: all .3s; overflow: hidden;
+    }
+    .step-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+      background: var(--gradient-blue); transform: scaleX(0); transform-origin: left;
+      transition: transform .4s;
+    }
+    .step-card:hover { border-color: var(--bleu-clr); box-shadow: 0 16px 48px rgba(46,109,164,.12); }
+    .step-card:hover::before { transform: scaleX(1); }
+    .step-num {
+      font-family: var(--font-head); font-size: .75rem; font-weight: 700; color: var(--bleu-clr);
+      text-transform: uppercase; letter-spacing: .1em; margin-bottom: 1rem;
+    }
+    .step-ico { font-size: 2.5rem; margin-bottom: 1rem; }
+    .step-title { font-family: var(--font-head); font-size: 1.1rem; font-weight: 700; color: var(--text-dark); margin-bottom: .75rem; }
+    .step-desc { font-size: .9rem; color: var(--gris); line-height: 1.7; }
+    .step-tag {
+      display: inline-block; margin-top: 1rem; font-size: .75rem; font-weight: 600;
+      background: var(--gris-light); color: var(--bleu-clr); padding: .3rem .8rem; border-radius: 20px;
+    }
+
+    /* ── ZONES ── */
+    #zones { background: var(--gris-light); }
+    .zones-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1.5rem; margin-top: 3rem; }
+    .zone-card {
+      background: var(--blanc); border-radius: 16px; padding: 1.5rem 1rem;
+      text-align: center; border: 1.5px solid transparent; transition: all .3s;
+      box-shadow: 0 2px 16px rgba(0,0,0,.05);
+    }
+    .zone-card:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(0,0,0,.1); }
+    .zone-card.critique { border-color: rgba(255,71,87,.25); }
+    .zone-card.moyen    { border-color: rgba(255,165,2,.25); }
+    .zone-card.faible   { border-color: rgba(46,213,115,.25); }
+    .zone-card.normal   { border-color: rgba(46,109,164,.2); }
+    .zone-ico { font-size: 2rem; margin-bottom: .6rem; }
+    .zone-id { font-size: .7rem; font-weight: 700; color: var(--gris); letter-spacing: .1em; margin-bottom: .25rem; }
+    .zone-card-name { font-size: .95rem; font-weight: 700; color: var(--text-dark); margin-bottom: .5rem; }
+    .zone-pop { font-size: .8rem; color: var(--gris); margin-bottom: .75rem; }
+    .zone-risk-label { font-size: .75rem; font-weight: 700; padding: .35rem .75rem; border-radius: 20px; display: inline-block; }
+    .zone-card.critique .zone-risk-label { background: rgba(255,71,87,.1); color: #FF4757; }
+    .zone-card.moyen    .zone-risk-label { background: rgba(255,165,2,.1);  color: #FFA502; }
+    .zone-card.faible   .zone-risk-label { background: rgba(46,213,115,.1); color: #2ED573; }
+    .zone-card.normal   .zone-risk-label { background: rgba(46,109,164,.1); color: var(--bleu-clr); }
+
+    /* ── TECH ── */
+    #tech { background: var(--blanc); }
+    .tech-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; margin-top: 3rem; }
+    .tech-pill {
+      display: inline-flex; align-items: center; gap: .5rem;
+      background: var(--gris-light); border-radius: 50px; padding: .5rem 1rem;
+      font-size: .8rem; font-weight: 600; color: var(--text-dark); margin: .3rem;
+    }
+    .tech-pill .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .tech-pills { margin-top: 2rem; }
+    .feature-list { list-style: none; display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+    .feature-list li { display: flex; align-items: flex-start; gap: 1rem; }
+    .feature-icon { width: 40px; height: 40px; border-radius: 10px; background: var(--gris-light); display: flex; align-items: center; justify-content: center; font-size: 1.2rem; flex-shrink: 0; }
+    .feature-text-title { font-size: .95rem; font-weight: 700; color: var(--text-dark); }
+    .feature-text-sub { font-size: .82rem; color: var(--gris); margin-top: 2px; }
+
+    /* ── ÉQUIPE ── */
+    #team { background: var(--gris-light); }
+    .team-center { display: flex; flex-direction: column; align-items: center; margin-top: 3rem; }
+    .team-card {
+      background: var(--blanc); border-radius: 24px; padding: 3rem;
+      max-width: 600px; text-align: center; box-shadow: 0 16px 64px rgba(0,0,0,.08);
+      border: 1.5px solid rgba(46,109,164,.1);
+    }
+    .team-avatar {
+      width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 1.5rem;
+      background: var(--gradient-blue); display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem; font-weight: 800; color: var(--blanc); font-family: var(--font-head);
+      box-shadow: 0 8px 32px rgba(46,109,164,.3);
+    }
+    .team-name { font-family: var(--font-head); font-size: 1.5rem; font-weight: 700; color: var(--text-dark); }
+    .team-role { font-size: .95rem; color: var(--bleu-clr); font-weight: 600; margin-top: .3rem; }
+    .team-bio { font-size: .92rem; color: var(--gris); line-height: 1.8; margin-top: 1rem; }
+    .team-tags { display: flex; flex-wrap: wrap; gap: .5rem; justify-content: center; margin-top: 1.5rem; }
+    .team-tag {
+      background: var(--gris-light); color: var(--text-dark); font-size: .78rem;
+      font-weight: 600; padding: .3rem .9rem; border-radius: 50px;
+    }
+
+    /* ── COMPÉTITIONS ── */
+    #competitions { background: var(--blanc); }
+    .comps-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2rem; margin-top: 3rem; }
+    .comp-card {
+      border-radius: 20px; padding: 2rem; border: 1.5px solid var(--gris-light); transition: all .3s;
+      display: flex; gap: 1.5rem; align-items: flex-start;
+    }
+    .comp-card:hover { border-color: var(--bleu-clr); box-shadow: 0 12px 40px rgba(46,109,164,.1); transform: translateY(-3px); }
+    .comp-card.selected { border-color: var(--or); background: rgba(232,160,32,.04); }
+    .comp-icon { font-size: 2.5rem; flex-shrink: 0; }
+    .comp-badge { font-size: .7rem; font-weight: 700; padding: .25rem .7rem; border-radius: 20px; margin-bottom: .5rem; display: inline-block; }
+    .badge-selected { background: rgba(232,160,32,.15); color: var(--or); }
+    .badge-target { background: rgba(46,109,164,.1); color: var(--bleu-clr); }
+    .comp-name { font-family: var(--font-head); font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: .4rem; }
+    .comp-desc { font-size: .85rem; color: var(--gris); line-height: 1.6; }
+
+    /* ── CONTACT CTA ── */
+    #contact {
+      background: var(--gradient-hero); color: var(--blanc);
+      text-align: center; padding: 120px 5%;
+    }
+    #contact .section-title { color: var(--blanc); }
+    #contact .section-sub { color: rgba(255,255,255,.65); margin: 1rem auto 2.5rem; }
+    .contact-form {
+      max-width: 540px; margin: 0 auto; display: flex; flex-direction: column; gap: 1rem;
+    }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .form-input {
+      width: 100%; padding: 1rem 1.2rem; border-radius: 12px; font-size: .95rem;
+      border: 1.5px solid rgba(255,255,255,.15); background: rgba(255,255,255,.07);
+      color: var(--blanc); font-family: var(--font-main); outline: none;
+      transition: border-color .2s;
+    }
+    .form-input::placeholder { color: rgba(255,255,255,.35); }
+    .form-input:focus { border-color: var(--or); }
+    textarea.form-input { resize: vertical; min-height: 110px; }
+    .btn-submit {
+      background: var(--gradient-or); color: var(--bleu); font-weight: 700;
+      padding: 1rem 2.5rem; border-radius: 50px; font-size: 1rem; border: none;
+      cursor: pointer; transition: transform .2s, box-shadow .2s; font-family: var(--font-main);
+    }
+    .btn-submit:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(232,160,32,.5); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: var(--bleu); padding: 3rem 5%; color: rgba(255,255,255,.5);
+      display: flex; align-items: center; justify-content: space-between; flex-wrap: gap 1rem;
+    }
+    .footer-logo { font-family: var(--font-head); font-size: 1.2rem; font-weight: 700; color: var(--blanc); }
+    .footer-logo span { color: var(--or); }
+    .footer-links { display: flex; gap: 2rem; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,.5); text-decoration: none; font-size: .85rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--or); }
+    .footer-copy { font-size: .8rem; }
+
+    /* ── OR DIVIDER ── */
+    .or-divider { width: 60px; height: 4px; background: var(--gradient-or); border-radius: 2px; margin: 1rem 0 1.5rem; }
+    .text-center .or-divider { margin: 1rem auto 1.5rem; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1000px) {
+      .hero-visual { display: none; }
+      .ps-grid, .tech-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps-grid { grid-template-columns: 1fr; max-width: 500px; margin-left: auto; margin-right: auto; }
+      .zones-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 640px) {
+      .stats-grid, .comps-grid { grid-template-columns: 1fr; }
+      .zones-grid { grid-template-columns: repeat(2, 1fr); }
+      .form-row { grid-template-columns: 1fr; }
+      .nav-links { display: none; }
+      footer { flex-direction: column; gap: 1.5rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAVIGATION ── -->
+<nav id="navbar">
+  <a href="#hero" class="nav-logo"><span>🌊 KATARA</span> <span class="dot"></span></a>
+  <ul class="nav-links">
+    <li><a href="#problem">Problème</a></li>
+    <li><a href="#how">Solution</a></li>
+    <li><a href="#tech">Technologie</a></li>
+    <li><a href="#team">Équipe</a></li>
+    <li><a href="#competitions">Prix</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Contacter l'équipe →</a>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="hero-bg-circles">
+    <div class="circle c1"></div>
+    <div class="circle c2"></div>
+    <div class="circle c3"></div>
+  </div>
+
+  <div class="hero-content">
+    <div class="hero-badge"><span class="live"></span> Système actif — Lomé, Togo · 2025</div>
+    <h1 class="hero-title">
+      Prédire les<br><span class="accent">inondations</span><br>
+      <span class="accent-blue">avant qu'elles frappent.</span>
+    </h1>
+    <p class="hero-sub">
+      KATARA est une plateforme IA de prédiction d'inondations pour l'Afrique de l'Ouest.
+      Données satellitaires, ML temps réel et alertes SMS pour protéger des milliers de vies.
+    </p>
+    <div class="hero-actions">
+      <a href="#contact" class="btn-primary">📄 Demander le pitch deck</a>
+      <a href="#how" class="btn-secondary">Voir comment ça marche</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="hstat-val">89%</div><div class="hstat-lbl">Précision du modèle</div></div>
+      <div><div class="hstat-val">5</div><div class="hstat-lbl">Zones surveillées</div></div>
+      <div><div class="hstat-val">1 240</div><div class="hstat-lbl">SMS d'alerte envoyés</div></div>
+      <div><div class="hstat-val">6h</div><div class="hstat-lbl">D'anticipation</div></div>
+    </div>
+  </div>
+
+  <!-- Live zones card -->
+  <div class="hero-visual">
+    <div class="map-card">
+      <div class="map-card-header">
+        <span class="map-card-title">📡 Surveillance en temps réel</span>
+        <span class="map-live">En direct</span>
+      </div>
+      <div id="zone-list">
+        <div class="zone-row">
+          <span class="zone-name">Bè-Kpota</span>
+          <div class="zone-prob-bar"><div class="zone-prob-fill prob-crit" style="width:78%"></div></div>
+          <span class="zone-badge badge-crit">CRITIQUE</span>
+        </div>
+        <div class="zone-row">
+          <span class="zone-name">Légbassito</span>
+          <div class="zone-prob-bar"><div class="zone-prob-fill prob-crit" style="width:82%"></div></div>
+          <span class="zone-badge badge-crit">CRITIQUE</span>
+        </div>
+        <div class="zone-row">
+          <span class="zone-name">Agbalépédogan</span>
+          <div class="zone-prob-bar"><div class="zone-prob-fill prob-moyen" style="width:55%"></div></div>
+          <span class="zone-badge badge-moyen">MOYEN</span>
+        </div>
+        <div class="zone-row">
+          <span class="zone-name">Lomé Centre</span>
+          <div class="zone-prob-bar"><div class="zone-prob-fill prob-faible" style="width:35%"></div></div>
+          <span class="zone-badge badge-faible">FAIBLE</span>
+        </div>
+        <div class="zone-row">
+          <span class="zone-name">Agoè</span>
+          <div class="zone-prob-bar"><div class="zone-prob-fill prob-normal" style="width:18%"></div></div>
+          <span class="zone-badge badge-normal">NORMAL</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-wave">
+    <svg viewBox="0 0 1440 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,40 C360,80 1080,0 1440,40 L1440,60 L0,60 Z" fill="#F0F4F8"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ── PROBLÈME / SOLUTION ── -->
+<section id="problem">
+  <div class="text-center">
+    <div class="section-label">Le défi climatique africain</div>
+    <h2 class="section-title">Un problème <span class="accent">critique</span>, une réponse <span class="accent">précise</span></h2>
+    <div class="or-divider"></div>
+  </div>
+  <div class="ps-grid">
+    <div class="problem-card">
+      <div class="ps-icon">⚠️</div>
+      <div class="ps-head">Sans KATARA</div>
+      <ul class="ps-list">
+        <li data-icon="🔴">Les crues surviennent sans avertissement, laissant zéro temps de réaction aux familles.</li>
+        <li data-icon="🔴">0 système d'alerte précoce opérationnel au Togo pour les populations non connectées.</li>
+        <li data-icon="🔴">Les inondations détruisent 15% des récoltes et ravagent des quartiers entiers chaque année.</li>
+        <li data-icon="🔴">Les agences publiques manquent de données spatiales précises pour agir en amont.</li>
+      </ul>
+    </div>
+    <div class="solution-card">
+      <div class="ps-icon">💡</div>
+      <div class="ps-head">Avec KATARA</div>
+      <ul class="ps-list">
+        <li data-icon="✅">Prédiction IA 6 à 48h à l'avance grâce à l'analyse satellitaire Sentinel-1 et météo.</li>
+        <li data-icon="✅">Alertes SMS automatiques en français et en langues locales, même sans internet.</li>
+        <li data-icon="✅">Tableau de bord temps réel pour les autorités ANPC et la protection civile.</li>
+        <li data-icon="✅">Modèle Random Forest entraîné sur 25 ans de données hydrologiques — 89% de précision.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── IMPACT STATS ── -->
+<section id="impact">
+  <div class="text-center">
+    <div class="section-label" style="color:var(--or)">Impact mesuré</div>
+    <h2 class="section-title">Des chiffres qui parlent</h2>
+    <div class="section-sub">En quelques mois de prototype, KATARA a déjà démontré une capacité d'impact réelle sur le terrain.</div>
+    <div class="or-divider"></div>
+  </div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="stat-num">89<span class="stat-unit">%</span></div>
+      <div class="stat-label">Précision du modèle ML</div>
+      <div class="stat-sub">+4pts vs mois précédent</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">2 400</div>
+      <div class="stat-label">Personnes pré-évacuées</div>
+      <div class="stat-sub">Zone Lomé-Sud · Fév. 2025</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">1 240</div>
+      <div class="stat-label">SMS d'alerte envoyés</div>
+      <div class="stat-sub">Taux de livraison : 100%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">5</div>
+      <div class="stat-label">Zones actives surveillées</div>
+      <div class="stat-sub">191 000 habitants couverts</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMMENT ÇA MARCHE ── -->
+<section id="how">
+  <div class="text-center">
+    <div class="section-label">La plateforme</div>
+    <h2 class="section-title">Comment <span class="accent">KATARA</span> prédit une inondation</h2>
+    <div class="or-divider"></div>
+    <p class="section-sub">Un pipeline entièrement automatisé, de la collecte de données à l'alerte SMS en moins de 5 minutes.</p>
+  </div>
+  <div class="steps-grid">
+    <div class="step-card">
+      <div class="step-num">Étape 01</div>
+      <div class="step-ico">🛰️</div>
+      <div class="step-title">Collecte de données multi-sources</div>
+      <p class="step-desc">KATARA agrège en continu : données satellites Sentinel-1 (radar SAR), indices NDVI/NDWI, météo OpenWeatherMap, et capteurs terrain.</p>
+      <span class="step-tag">Google Earth Engine · OpenWeatherMap</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">Étape 02</div>
+      <div class="step-ico">🧠</div>
+      <div class="step-title">Prédiction par IA — Random Forest</div>
+      <p class="step-desc">Un modèle ML entraîné sur 25 ans de données analyse 15+ variables (pluie, sol, drainage, topographie) pour calculer une probabilité d'inondation.</p>
+      <span class="step-tag">scikit-learn · Python · SQLite</span>
+    </div>
+    <div class="step-card">
+      <div class="step-num">Étape 03</div>
+      <div class="step-ico">📱</div>
+      <div class="step-title">Alertes SMS automatiques</div>
+      <p class="step-desc">Si le risque dépasse le seuil critique, des SMS géolocalisés sont envoyés aux téléphones enregistrés dans la zone — sans nécessiter d'internet.</p>
+      <span class="step-tag">Africa's Talking · Couverture 100%</span>
+    </div>
+  </div>
+</section>
+
+<!-- ── ZONES ── -->
+<section id="zones">
+  <div class="text-center">
+    <div class="section-label">Couverture géographique</div>
+    <h2 class="section-title">5 zones surveillées — <span class="accent">Région Maritime, Togo</span></h2>
+    <div class="or-divider"></div>
+  </div>
+  <div class="zones-grid">
+    <div class="zone-card critique">
+      <div class="zone-ico">🔴</div>
+      <div class="zone-id">LOM-001</div>
+      <div class="zone-card-name">Bè-Kpota</div>
+      <div class="zone-pop">👥 15 000 hab. · Sol argileux</div>
+      <div class="zone-risk-label">Critique · 78%</div>
+    </div>
+    <div class="zone-card moyen">
+      <div class="zone-ico">🟡</div>
+      <div class="zone-id">LOM-002</div>
+      <div class="zone-card-name">Agoè-Nyivé</div>
+      <div class="zone-pop">👥 22 000 hab. · Sol latéritique</div>
+      <div class="zone-risk-label">Moyen · 55%</div>
+    </div>
+    <div class="zone-card faible">
+      <div class="zone-ico">🟢</div>
+      <div class="zone-id">LOM-003</div>
+      <div class="zone-card-name">Baguida</div>
+      <div class="zone-pop">👥 8 000 hab. · Sol sableux</div>
+      <div class="zone-risk-label">Faible · 35%</div>
+    </div>
+    <div class="zone-card normale">
+      <div class="zone-ico">🔵</div>
+      <div class="zone-id">LOM-004</div>
+      <div class="zone-card-name">Aflao-Gakli</div>
+      <div class="zone-pop">👥 11 000 hab. · Sol argileux</div>
+      <div class="zone-risk-label">Normal · 18%</div>
+    </div>
+    <div class="zone-card critique">
+      <div class="zone-ico">🔴</div>
+      <div class="zone-id">LOM-005</div>
+      <div class="zone-card-name">Lomé-Port</div>
+      <div class="zone-pop">👥 5 000 hab. · Sol sableux</div>
+      <div class="zone-risk-label">Critique · 82%</div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TECHNOLOGIE ── -->
+<section id="tech">
+  <div class="tech-grid">
+    <div>
+      <div class="section-label">Stack technique</div>
+      <h2 class="section-title">Une architecture robuste, <span class="accent">pensée pour l'Afrique</span></h2>
+      <div class="or-divider"></div>
+      <p class="section-sub">Conçue pour fonctionner avec une connexion limitée, sur des serveurs à faible coût, avec des alertes offline via SMS.</p>
+      <div class="tech-pills">
+        <span class="tech-pill"><span class="dot" style="background:#3776AB"></span> Python 3.12</span>
+        <span class="tech-pill"><span class="dot" style="background:#F7931E"></span> scikit-learn</span>
+        <span class="tech-pill"><span class="dot" style="background:#009639"></span> Africa's Talking</span>
+        <span class="tech-pill"><span class="dot" style="background:#4285F4"></span> Google Earth Engine</span>
+        <span class="tech-pill"><span class="dot" style="background:#4DB33D"></span> Flask API</span>
+        <span class="tech-pill"><span class="dot" style="background:#003B57"></span> SQLite</span>
+        <span class="tech-pill"><span class="dot" style="background:#E63946"></span> Sentinel-1 SAR</span>
+        <span class="tech-pill"><span class="dot" style="background:#E8A020"></span> Railway / Render</span>
+      </div>
+    </div>
+    <div>
+      <ul class="feature-list">
+        <li>
+          <div class="feature-icon">🔄</div>
+          <div><div class="feature-text-title">Surveillance automatique toutes les heures</div><div class="feature-text-sub">Scheduler Python — aucune intervention humaine requise</div></div>
+        </li>
+        <li>
+          <div class="feature-icon">📊</div>
+          <div><div class="feature-text-title">Dashboard temps réel</div><div class="feature-text-sub">Interface Web pour les agents ANPC et autorités locales</div></div>
+        </li>
+        <li>
+          <div class="feature-icon">📄</div>
+          <div><div class="feature-text-title">Rapport PDF mensuel automatique</div><div class="feature-text-sub">Généré par ReportLab — prêt pour bailleurs de fonds</div></div>
+        </li>
+        <li>
+          <div class="feature-icon">☁️</div>
+          <div><div class="feature-text-title">Déploiement cloud flexible</div><div class="feature-text-sub">Dockerfile inclus · Compatible Railway, Render, GCP</div></div>
+        </li>
+        <li>
+          <div class="feature-icon">🔒</div>
+          <div><div class="feature-text-title">Données souveraines</div><div class="feature-text-sub">Architecture Togo-first, extensible à toute l'Afrique de l'Ouest</div></div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ── ÉQUIPE ── -->
+<section id="team">
+  <div class="text-center">
+    <div class="section-label">Fondatrice</div>
+    <h2 class="section-title">L'humain derrière KATARA</h2>
+    <div class="or-divider"></div>
+  </div>
+  <div class="team-center">
+    <div class="team-card">
+      <div class="team-avatar">R</div>
+      <div class="team-name">Ruth Ameyo Gliglo</div>
+      <div class="team-role">CEO & Fondatrice · KATARA</div>
+      <p class="team-bio">
+        Ingénieure et entrepreneure togolaise, Ruth Ameyo Gliglo a fondé KATARA avec une conviction simple :
+        la technologie IA doit servir les plus vulnérables face au changement climatique.
+        Elle combine expertise en machine learning, données satellitaires et connaissance du terrain
+        pour bâtir un système de résilience climatique ancré dans les réalités africaines.
+      </p>
+      <div class="team-tags">
+        <span class="team-tag">Machine Learning</span>
+        <span class="team-tag">Remote Sensing</span>
+        <span class="team-tag">Togo · Afrique de l'Ouest</span>
+        <span class="team-tag">Résilience Climatique</span>
+        <span class="team-tag">Impact Social</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── COMPÉTITIONS ── -->
+<section id="competitions">
+  <div class="text-center">
+    <div class="section-label">Reconnaissance internationale</div>
+    <h2 class="section-title">Sélectionnée dans les <span class="accent">meilleures compétitions</span></h2>
+    <div class="section-sub">KATARA est reconnue par les institutions internationales les plus prestigieuses dans le domaine du climat et de l'IA.</div>
+    <div class="or-divider"></div>
+  </div>
+  <div class="comps-grid">
+    <div class="comp-card selected">
+      <div class="comp-icon">🏆</div>
+      <div>
+        <span class="comp-badge badge-selected">✅ SÉLECTIONNÉE 2025</span>
+        <div class="comp-name">Xylem Global Water Challenge 2025</div>
+        <p class="comp-desc">Sélectionnée parmi des centaines de projets mondiaux d'innovation pour l'eau.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">🤖</div>
+      <div>
+        <span class="comp-badge badge-target">🎯 CIBLE 2026</span>
+        <div class="comp-name">African Presidential Competition — IA & Robotique</div>
+        <p class="comp-desc">Compétition continentale récompensant les meilleures innovations IA sur le continent.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">🌍</div>
+      <div>
+        <span class="comp-badge badge-target">🎯 CIBLE 2026</span>
+        <div class="comp-name">DID Summit 2026 — Infrastructure Données Climatiques</div>
+        <p class="comp-desc">Présentation devant les décideurs de l'écosystème données & développement durable.</p>
+      </div>
+    </div>
+    <div class="comp-card">
+      <div class="comp-icon">🇦🇺</div>
+      <div>
+        <span class="comp-badge badge-target">🎯 CIBLE 2026</span>
+        <div class="comp-name">African Union Digital & Innovation Fellowship</div>
+        <p class="comp-desc">Programme de l'Union Africaine pour les innovateurs tech à impact continental.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section id="contact">
+  <div class="section-label" style="color:var(--or)">Investisseurs & Partenaires</div>
+  <h2 class="section-title">Construisons ensemble la résilience climatique de l'Afrique</h2>
+  <div class="or-divider" style="margin:1rem auto 1rem;"></div>
+  <p class="section-sub">Nous recherchons des partenaires (UNDP, bailleurs, ONG, investisseurs impact) pour accélérer le déploiement de KATARA à l'échelle régionale.</p>
+  <form class="contact-form" onsubmit="handleSubmit(event)">
+    <div class="form-row">
+      <input id="name" class="form-input" type="text" placeholder="Votre nom" required/>
+      <input id="org" class="form-input" type="text" placeholder="Organisation"/>
+    </div>
+    <input id="email" class="form-input" type="email" placeholder="Email professionnel" required/>
+    <textarea id="message" class="form-input" placeholder="Je souhaite discuter de... (partenariat, financement, pilote terrain...)" required></textarea>
+    <button type="submit" class="btn-submit">📨 Envoyer le message</button>
+    <p id="form-success" style="color:var(--or);display:none;margin-top:.5rem;font-weight:600;">✅ Message envoyé ! Nous reviendrons vers vous sous 48h.</p>
+  </form>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="footer-logo">🌊 <span>KATARA</span></div>
+  <div class="footer-links">
+    <a href="#hero">Accueil</a>
+    <a href="#how">Solution</a>
+    <a href="#tech">Tech</a>
+    <a href="#team">Équipe</a>
+    <a href="#contact">Contact</a>
+    <a href="katara_dashboard.html">Dashboard →</a>
+  </div>
+  <div class="footer-copy">© 2025 KATARA · Lomé, Togo · contact@katara.tg · Confidentiel</div>
+</footer>
+
+<script>
+  // Sticky nav scroll effect
+  window.addEventListener('scroll', () => {
+    document.getElementById('navbar').style.boxShadow =
+      window.scrollY > 20 ? '0 4px 32px rgba(0,0,0,.4)' : 'none';
+  });
+
+  // Count-up animation for stats
+  function countUp(el, target, suffix='') {
+    let start = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+      start += step;
+      if (start >= target) { el.textContent = target.toLocaleString('fr-FR') + suffix; clearInterval(timer); return; }
+      el.textContent = Math.floor(start).toLocaleString('fr-FR') + suffix;
+    }, 24);
+  }
+
+  // Intersection observer for stats section
+  const statNums = document.querySelectorAll('.stat-num');
+  const statsData = [89, 2400, 1240, 5];
+  const statSuffixes = ['%', '', '', ''];
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        statNums.forEach((el, i) => {
+          el.innerHTML = '';
+          countUp(el, statsData[i], statSuffixes[i]);
+        });
+        observer.disconnect();
+      }
+    });
+  }, { threshold: 0.4 });
+  if (statNums.length) observer.observe(statNums[0].closest('section') || document.body);
+
+  // Form handler (demo)
+  function handleSubmit(e) {
+    e.preventDefault();
+    document.getElementById('form-success').style.display = 'block';
+    e.target.querySelectorAll('input,textarea').forEach(f => f.value='');
+    setTimeout(() => document.getElementById('form-success').style.display='none', 5000);
+  }
+
+  // Animate zone bars on load
+  window.addEventListener('load', () => {
+    document.querySelectorAll('.zone-prob-fill').forEach(bar => {
+      const w = bar.style.width;
+      bar.style.width = '0';
+      setTimeout(() => bar.style.width = w, 500);
+    });
+  });
+</script>
+</body>
+</html>

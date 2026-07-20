@@ -1,0 +1,148 @@
+
+.carte-page {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    padding-bottom: 0;
+}
+
+.carte-layout {
+    display: grid;
+    grid-template-columns: 1fr 280px;
+    gap: 1.5rem;
+    height: calc(100vh - 200px);
+    min-height: 500px;
+}
+
+.map-wrapper {
+    padding: 0;
+    overflow: hidden;
+    height: 100%;
+}
+
+.map-wrapper .leaflet-container {
+    height: 100%;
+    width: 100%;
+    border-radius: 12px;
+    background: #0A192F;
+}
+
+.carte-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1.25rem;
+    overflow-y: auto;
+}
+
+.carte-legend h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #94A3B8;
+    margin: 0 0 0.25rem 0;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.85rem;
+    color: #CBD5E1;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: inline-block;
+}
+
+.zone-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.zone-item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.zone-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.zone-item.selected {
+    background: rgba(59, 130, 246, 0.15);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.zone-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #E2E8F0;
+}
+
+.zone-meta {
+    font-size: 0.75rem;
+    color: #94A3B8;
+}
+
+.zone-detail {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.zone-detail h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.9rem;
+    color: #60A5FA;
+}
+
+.zone-detail table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+}
+
+.zone-detail td {
+    padding: 0.2rem 0.4rem;
+    color: #94A3B8;
+}
+
+.zone-detail td:last-child {
+    color: #E2E8F0;
+    text-align: right;
+}
+
+.map-popup {
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #1e293b;
+}
+
+.map-popup strong {
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+@media (max-width: 768px) {
+    .carte-layout {
+        grid-template-columns: 1fr;
+        height: auto;
+    }
+    .map-wrapper {
+        height: 350px;
+    }
+}

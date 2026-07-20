@@ -1,0 +1,12 @@
+{
+  "name": "KATARA - Prediction d'Inondations",
+  "short_name": "KATARA",
+  "description": "Systeme d'alerte precoce aux inondations au Togo",
+  "theme_color": "#0A192F",
+  "background_color": "#0A192F",
+  "display": "standalone",
+  "start_url": "/",
+  "icons": [
+    { "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}

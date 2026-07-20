@@ -1,0 +1,112 @@
+.apropos-page {
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+}
+
+.apropos-hero {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.apropos-hero .page-subtitle {
+    margin: 0 auto 2rem;
+    font-size: 1.25rem;
+    line-height: 1.6;
+}
+
+.apropos-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+}
+
+@media (min-width: 768px) {
+    .apropos-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.apropos-content-card {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.apropos-content-card h2 {
+    font-size: 2rem;
+    margin: 0;
+}
+
+.apropos-content-card p {
+    color: var(--text-muted);
+    line-height: 1.7;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.team-icons {
+    display: flex;
+    gap: 2rem;
+    justify-content: space-around;
+    margin-top: 1rem;
+}
+
+.team-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.awards-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.awards-list li {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.awards-list span {
+    color: #E2E8F0;
+}
+
+.awards-list strong {
+    color: white;
+}
+
+.contact-section {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    padding: 4rem 2rem;
+    background: linear-gradient(180deg, rgba(17, 34, 64, 0.7) 0%, rgba(37, 99, 235, 0.1) 100%);
+}
+
+.contact-section h2 {
+    font-size: 2.25rem;
+    margin: 0;
+}
+
+.contact-section p {
+    color: var(--text-muted);
+    max-width: 600px;
+    line-height: 1.6;
+    margin: 0;
+}
