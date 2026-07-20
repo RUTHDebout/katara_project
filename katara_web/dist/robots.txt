@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://katara.tg/sitemap.xml
